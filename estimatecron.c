@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
@@ -5,7 +6,6 @@
 #include <ctype.h>
 
 #define MAX_LEN 256
-
 
 // for reading crontab file
 void readcrontab(char const *const filename)
@@ -19,10 +19,12 @@ void readcrontab(char const *const filename)
         printf("file can't be opened \n");
     }
 
-    printf("content of this file are \n");
+    printf("crontab entries: \n");
 
     while (fgets(str, 50, ptr) != NULL)
     {
+        if (str[0] == '#')
+            continue;
         printf("%s", str);
     }
     printf("\n");
@@ -42,10 +44,12 @@ void readestimates(char const *const filename)
         printf("file can't be opened \n");
     }
 
-    printf("content of this file are \n");
+    printf("estimate entries: \n");
 
     while (fgets(str, 50, ptr) != NULL)
     {
+        if (str[0] == '#')
+            continue;
         printf("%s", str);
     }
     printf("\n");
@@ -53,15 +57,15 @@ void readestimates(char const *const filename)
     fclose(ptr);
 }
 
-//for fetching most user command
-int mostfrequent(void)
+// for fetching most user command
+int mostfrequent()
 {
     FILE *file;
-    char ch;
-    size_t len = 256, read;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
     char words[1000][1000], word[20];
     int i = 0, j, k, maxCount = 0, count;
-    char line[MAX_LEN];
 
     // Opens file in read mode
     file = fopen("crontab-file.txt", "r");
@@ -74,23 +78,28 @@ int mostfrequent(void)
     }
 
     printf("file opened\n");
-
     // Since, C doesn't provide in-built function,
     // following code will split content of file into words
-
-    while (fgets(line, MAX_LEN, file))
-    // while ((read = getline(&line, &len, file)) != -1)
+    while ((read = getline(&line, &len, file)) != -1)
     {
-        printf("inside while: %s", line);
 
-        for (k = 0; k < strlen(line); k++)
+        if (line[0] == '#')
         {
-            printf("inside for: %c", line[k]);
+            continue;
+        }
+        system(line);
+        printf("Commnd Executed");
+
+        printf("%s\n", line);
+        // printf("inside while\n");
+        for (k = 0; line[k] != '\0'; k++)
+        {
+            // printf("inside for\n");
             // Here, i represents row and j represents column of two-dimensional array words
             if (line[k] != ' ' && line[k] != '\n' && line[k] != ',' && line[k] != '.')
             {
                 words[i][j++] = tolower(line[k]);
-                printf("adding record");
+                printf("if %c\n", line[k]);
             }
             else
             {
@@ -99,13 +108,13 @@ int mostfrequent(void)
                 i++;
                 // Set column count to 0
                 j = 0;
-                printf("else part");
+                printf("else\n");
             }
-            printf("end for");
         }
     }
 
     int length = i;
+    printf("length :%d\n", length);
 
     // Determine the most repeated word in a file
     for (i = 0; i < length; i++)
@@ -117,23 +126,34 @@ int mostfrequent(void)
             if (strcmp(words[i], words[j]) == 0 && (strcmp(words[i], " ") != 0))
             {
                 count++;
-                printf("counting");
+                // printf("%s %s\n", words[i], words[j]);
             }
         }
         // If maxCount is less than count then store value of count in maxCount
         // and corresponding word to variable word
+        printf("count : %d\n", count);
         if (count > maxCount)
         {
             maxCount = count;
             strcpy(word, words[i]);
-            printf("comparing");
+            printf("word: %s\n", words[j]);
         }
     }
 
-    printf("Most frequently executed command: %s", word);
-    fclose(file);
-    return 0;
+    // printf("The Array elements are:\n");
+    // for (int i = 0; i < 1000; i++)
+    // {
+    //     for (int j = 0; j < 1000; j++)
+    //     {
+    //         printf("%d ", words[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
+    printf("Most repeated word: %s", word);
+    fclose(file);
+
+    return 0;
 }
 
 // Here, argc counts the number of arguments. It counts the file name as the first argument.
