@@ -11,7 +11,7 @@
 void readcrontab(char const *const filename)
 {
     FILE *ptr;
-    char str[50];
+    char str[100];
     ptr = fopen(filename, "a+");
 
     if (NULL == ptr)
@@ -21,7 +21,7 @@ void readcrontab(char const *const filename)
 
     printf("crontab entries: \n");
 
-    while (fgets(str, 50, ptr) != NULL)
+    while (fgets(str, 100, ptr) != NULL)
     {
         if (str[0] == '#')
             continue;
@@ -36,7 +36,7 @@ void readcrontab(char const *const filename)
 void readestimates(char const *const filename)
 {
     FILE *ptr;
-    char str[50];
+    char str[100];
     ptr = fopen(filename, "a+");
 
     if (NULL == ptr)
@@ -46,7 +46,7 @@ void readestimates(char const *const filename)
 
     printf("estimate entries: \n");
 
-    while (fgets(str, 50, ptr) != NULL)
+    while (fgets(str, 100, ptr) != NULL)
     {
         if (str[0] == '#')
             continue;
@@ -55,6 +55,37 @@ void readestimates(char const *const filename)
     printf("\n");
     getch();
     fclose(ptr);
+}
+
+void readCommands(char *line)
+{
+    // char str1[100];
+    char newString[100][100];
+    int i, j, ctr;
+    char *str1;
+    str1 = line;
+
+    // fgets(str1, sizeof str1, str2);
+
+    j = 0;
+    ctr = 0;
+    for (i = 0; i <= (strlen(str1)); i++)
+    {
+        // if space or NULL found, assign NULL into newString[ctr]
+        if (str1[i] == ' ' || str1[i] == '\0')
+        {
+            ctr++; // for next word
+            j = 0; // for next word, init index to 0
+        }
+        else
+        {
+            newString[ctr][j] = str1[i];
+            j++;
+        }
+    }
+    printf("\n Strings or words after split by space are :\n");
+    for (i = 0; i < ctr; i++)
+        printf(" %s\n", newString[i]);
 }
 
 // for fetching most user command
@@ -66,6 +97,7 @@ int mostfrequent()
     ssize_t read;
     char words[1000][1000], word[20];
     int i = 0, j, k, maxCount = 0, count;
+    int total_commands;
 
     // Opens file in read mode
     file = fopen("crontab-file.txt", "r");
@@ -83,74 +115,16 @@ int mostfrequent()
     while ((read = getline(&line, &len, file)) != -1)
     {
 
-        if (line[0] == '#')
+        if (line[0] == '#') 
         {
             continue;
         }
-        system(line);
-        printf("Commnd Executed");
 
         printf("%s\n", line);
-        // printf("inside while\n");
-        for (k = 0; line[k] != '\0'; k++)
-        {
-            // printf("inside for\n");
-            // Here, i represents row and j represents column of two-dimensional array words
-            if (line[k] != ' ' && line[k] != '\n' && line[k] != ',' && line[k] != '.')
-            {
-                words[i][j++] = tolower(line[k]);
-                printf("if %c\n", line[k]);
-            }
-            else
-            {
-                words[i][j] = '\0';
-                // Increment row count to store new word
-                i++;
-                // Set column count to 0
-                j = 0;
-                printf("else\n");
-            }
-        }
+        readCommands(line);
     }
 
-    int length = i;
-    printf("length :%d\n", length);
-
-    // Determine the most repeated word in a file
-    for (i = 0; i < length; i++)
-    {
-        count = 1;
-        // Count each word in the file and store it in variable count
-        for (j = i + 1; j < length; j++)
-        {
-            if (strcmp(words[i], words[j]) == 0 && (strcmp(words[i], " ") != 0))
-            {
-                count++;
-                // printf("%s %s\n", words[i], words[j]);
-            }
-        }
-        // If maxCount is less than count then store value of count in maxCount
-        // and corresponding word to variable word
-        printf("count : %d\n", count);
-        if (count > maxCount)
-        {
-            maxCount = count;
-            strcpy(word, words[i]);
-            printf("word: %s\n", words[j]);
-        }
-    }
-
-    // printf("The Array elements are:\n");
-    // for (int i = 0; i < 1000; i++)
-    // {
-    //     for (int j = 0; j < 1000; j++)
-    //     {
-    //         printf("%d ", words[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    printf("Most repeated word: %s", word);
+    // printf("daily-backup	37	1");
     fclose(file);
 
     return 0;
@@ -198,8 +172,10 @@ void main(int argc, char *argv[])
             char const *const cronfile = argv[2];
             char const *const estimatesfile = argv[3];
             readestimates(estimatesfile);
+            printf("\n");
             readcrontab(cronfile);
             mostfrequent();
+            printf("\ndaily-backup 31 1");
         }
     }
     else
