@@ -57,15 +57,31 @@ void readestimates(char const *const filename)
     fclose(ptr);
 }
 
+char* uniq_spc(char* str){
+    char *from, *to;
+    int spc=0;
+    to=from=str;
+    while(1){
+        if(spc && *from == ' ' && to[-1] == ' ')
+            ++from;
+        else {
+            spc = (*from==' ')? 1 : 0;
+            *to++ = *from++;
+            if(!to[-1])break;
+        }
+    }
+    return str;
+}
+
 void readCommands(char *line)
 {
     // char str1[100];
     char newString[100][100];
     int i, j, ctr;
     char *str1;
-    str1 = line;
+    str1 = uniq_spc(line);
 
-    // fgets(str1, sizeof str1, str2);
+    // printf("str1: %s\n",str1);
 
     j = 0;
     ctr = 0;
@@ -74,8 +90,10 @@ void readCommands(char *line)
         // if space or NULL found, assign NULL into newString[ctr]
         if (str1[i] == ' ' || str1[i] == '\0')
         {
+
             ctr++; // for next word
-            j = 0; // for next word, init index to 0
+            if (str1[i - 1] != ' ')
+                j = 0; // for next word, init index to 0
         }
         else
         {
@@ -85,7 +103,7 @@ void readCommands(char *line)
     }
     printf("\n Strings or words after split by space are :\n");
     for (i = 0; i < ctr; i++)
-        printf(" %s\n", newString[i]);
+        printf(" %s,", newString[i]);
 }
 
 // for fetching most user command
@@ -109,13 +127,12 @@ int mostfrequent()
         exit(EXIT_FAILURE);
     }
 
-    printf("file opened\n");
     // Since, C doesn't provide in-built function,
     // following code will split content of file into words
     while ((read = getline(&line, &len, file)) != -1)
     {
 
-        if (line[0] == '#') 
+        if (line[0] == '#')
         {
             continue;
         }
