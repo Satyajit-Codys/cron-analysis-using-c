@@ -57,30 +57,34 @@ void readestimates(char const *const filename)
     fclose(ptr);
 }
 
-char* uniq_spc(char* str){
+char *uniq_spc(char *str)
+{
     char *from, *to;
-    int spc=0;
-    to=from=str;
-    while(1){
-        if(spc && *from == ' ' && to[-1] == ' ')
+    int spc = 0;
+    to = from = str;
+    while (1)
+    {
+        if (spc && *from == ' ' && to[-1] == ' ')
             ++from;
-        else {
-            spc = (*from==' ')? 1 : 0;
+        else
+        {
+            spc = (*from == ' ') ? 1 : 0;
             *to++ = *from++;
-            if(!to[-1])break;
+            if (!to[-1])
+                break;
         }
     }
     return str;
 }
 
-void readCommands(char *line)
+void readCommands(char *line, int month)
 {
     // char str1[100];
     char newString[100][100];
     int i, j, ctr;
     char *str1;
     str1 = uniq_spc(line);
-
+    int total_commands;
     // printf("str1: %s\n",str1);
 
     j = 0;
@@ -90,7 +94,6 @@ void readCommands(char *line)
         // if space or NULL found, assign NULL into newString[ctr]
         if (str1[i] == ' ' || str1[i] == '\0')
         {
-
             ctr++; // for next word
             if (str1[i - 1] != ' ')
                 j = 0; // for next word, init index to 0
@@ -104,10 +107,19 @@ void readCommands(char *line)
     printf("\n Strings or words after split by space are :\n");
     for (i = 0; i < ctr; i++)
         printf(" %s,", newString[i]);
+
+    if (ctr > 7)
+    {
+        printf("File format error");
+        exit(0);
+    }
+    // printf("%s", newString[3]);
+    // if(char newString[3]==atoi(month) || char newString[3] =='*')
+    //     total_commands ++;
 }
 
 // for fetching most user command
-int mostfrequent()
+int mostfrequent(int month)
 {
     FILE *file;
     char *line = NULL;
@@ -137,10 +149,10 @@ int mostfrequent()
             continue;
         }
 
-        printf("%s\n", line);
-        readCommands(line);
+        readCommands(line, month);
     }
 
+    printf("total commands: %d", total_commands);
     // printf("daily-backup	37	1");
     fclose(file);
 
@@ -186,12 +198,13 @@ void main(int argc, char *argv[])
                 }
             }
 
+            int month = atoi(argv[1]);
             char const *const cronfile = argv[2];
             char const *const estimatesfile = argv[3];
             readestimates(estimatesfile);
             printf("\n");
             readcrontab(cronfile);
-            mostfrequent();
+            mostfrequent(month);
             printf("\ndaily-backup 31 1");
         }
     }
