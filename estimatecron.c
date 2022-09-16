@@ -114,8 +114,10 @@ void readCommands(char *line, int month)
         exit(0);
     }
     // printf("%s", newString[3]);
-    // if(char newString[3]==atoi(month) || char newString[3] =='*')
-    //     total_commands ++;
+    printf("\nmonth: %d", month);
+
+    // if (newString[3] == atoi(month) || newString[3] == '*')
+    //     total_commands++;
 }
 
 // for fetching most user command
@@ -128,6 +130,8 @@ int mostfrequent(int month)
     char words[1000][1000], word[20];
     int i = 0, j, k, maxCount = 0, count;
     int total_commands;
+
+    printf("\nmonth: %d", month);
 
     // Opens file in read mode
     file = fopen("crontab-file.txt", "r");
@@ -190,10 +194,10 @@ void main(int argc, char *argv[])
             else
             {
                 int month_int = atoi(argv[1]);
-                printf("Entered Month is: %d\n", argv[1]);
-                if (!isdigit(argv[1][0]) || !isdigit(argv[1][1]) || (month_int > 11))
+                // printf("Entered Month is: %s\n", argv[1]);
+                if (argv[1] != "1" || argv[1] != "2" || argv[1] != "3" || argv[1] != "4" || argv[1] != "5" || argv[1] != "6" || argv[1] != "7" || argv[1] != "8" || argv[1] != "9" || argv[1] != "10" || argv[1] != "11" || argv[1] != "12" ||argv[1] != "jan" || argv[1] != "feb" || argv[1] != "mar" || argv[1] != "apr" || argv[1] != "may" || argv[1] != "jun" || argv[1] != "jul" || argv[1] != "aug" || argv[1] != "sep" || argv[1] != "oct" || argv[1] != "nov" || argv[1] != "dec" )
                 {
-                    printf("Enter month either an integer 0..11, or a 3-character name format.");
+                    printf("'%s' is an invalid month", argv[1]);
                     exit(0);
                 }
             }
