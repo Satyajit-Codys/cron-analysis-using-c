@@ -1,6 +1,6 @@
 #define _GNU_SOURCE
 #include <stdio.h>
-#include <conio.h>
+// #include <conio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -31,7 +31,7 @@ void readcrontab(char const *const filename)
         printf("%s", str);
     }
     printf("\n");
-    getch();
+    // getch();
     fclose(ptr);
 }
 
@@ -209,7 +209,7 @@ int mostfrequent(char const *const filename, char *month)
         readCommands(line, month);
     }
 
-    printf("\n %s %d %d", frequent_command, total_commands, last_command);
+    printf("\n%s %d %d\n", frequent_command, total_commands, last_command);
     // printf("daily-backup	37	1");
     fclose(file);
 
