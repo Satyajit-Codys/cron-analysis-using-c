@@ -6,6 +6,7 @@
 #include <ctype.h>
 
 #define MAX_LEN 256
+int total_commands;
 
 // for reading crontab file
 void readcrontab(char const *const filename)
@@ -50,6 +51,7 @@ void readestimates(char const *const filename)
     {
         if (str[0] == '#')
             continue;
+
         printf("%s", str);
     }
     printf("\n");
@@ -77,14 +79,13 @@ char *uniq_spc(char *str)
     return str;
 }
 
-void readCommands(char *line, int month)
+void readCommands(char *line, char *month)
 {
     // char str1[100];
     char newString[100][100];
     int i, j, ctr;
     char *str1;
     str1 = uniq_spc(line);
-    int total_commands;
     // printf("str1: %s\n",str1);
 
     j = 0;
@@ -113,15 +114,34 @@ void readCommands(char *line, int month)
         printf("File format error");
         exit(0);
     }
-    // printf("%s", newString[3]);
-    printf("\nmonth: %d", month);
+    // printf("\n%s", newString[3]);
+    // printf("\nmonth: %s", month);
 
-    // if (newString[3] == atoi(month) || newString[3] == '*')
-    //     total_commands++;
+    if (strcmp(newString[3], month) == 0 || strcmp(newString[3], "*") == 0)
+    {
+        if (strcmp(newString[4], "*") == 0)
+        {
+            if (strcmp(newString[2], "*") == 0)
+                total_commands = total_commands + 30;
+            else
+                total_commands = total_commands + 4;
+        }
+        else
+        {
+            total_commands++;
+        }
+        if (strcmp(newString[2], "*") == 0)
+        {
+
+            if (strcmp(newString[4], "*") != 0)
+                total_commands = total_commands + 4;
+        }
+    }
+    printf("\ntotal commands: %d", total_commands);
 }
 
 // for fetching most user command
-int mostfrequent(int month)
+int mostfrequent(char *month)
 {
     FILE *file;
     char *line = NULL;
@@ -129,9 +149,8 @@ int mostfrequent(int month)
     ssize_t read;
     char words[1000][1000], word[20];
     int i = 0, j, k, maxCount = 0, count;
-    int total_commands;
 
-    printf("\nmonth: %d", month);
+    printf("\nmonth: %s", month);
 
     // Opens file in read mode
     file = fopen("crontab-file.txt", "r");
@@ -156,7 +175,7 @@ int mostfrequent(int month)
         readCommands(line, month);
     }
 
-    printf("total commands: %d", total_commands);
+    printf("\ntotal commands: %d", total_commands);
     // printf("daily-backup	37	1");
     fclose(file);
 
@@ -187,29 +206,25 @@ void main(int argc, char *argv[])
 
         else if (strlen(argv[1]) < 4)
         {
-            if (strlen(argv[1]) == 3)
+            char *month = argv[1];
+
+            printf("Entered Month is: %s\n", argv[1]);
+
+            if (strcmp(month, "1") == 0 || strcmp(month, "2") == 0 || strcmp(month, "3") == 0 || strcmp(month, "4") == 0 || strcmp(month, "5") == 0 || strcmp(month, "6") == 0 || strcmp(month, "7") == 0 || strcmp(month, "8") == 0 || strcmp(month, "9") == 0 || strcmp(month, "10") == 0 || strcmp(month, "11") == 0 || strcmp(month, "12") == 0 || strcmp(month, "jan") == 0 || strcmp(month, "feb") == 0 || strcmp(month, "mar") == 0 || strcmp(month, "apr") == 0 || strcmp(month, "may") == 0 || strcmp(month, "jun") == 0 || strcmp(month, "jul") == 0 || strcmp(month, "aug") == 0 || strcmp(month, "sep") == 0 || strcmp(month, "oct") == 0 || strcmp(month, "nov") == 0 || strcmp(month, "dec") == 0)
             {
-                printf("Entered Month name is: %s\n", argv[1]);
+                char const *const cronfile = argv[2];
+                char const *const estimatesfile = argv[3];
+                readestimates(estimatesfile);
+                printf("\n");
+                readcrontab(cronfile);
+                mostfrequent(month);
+                printf("\ndaily-backup 31 1");
             }
             else
             {
-                int month_int = atoi(argv[1]);
-                // printf("Entered Month is: %s\n", argv[1]);
-                if (argv[1] != "1" || argv[1] != "2" || argv[1] != "3" || argv[1] != "4" || argv[1] != "5" || argv[1] != "6" || argv[1] != "7" || argv[1] != "8" || argv[1] != "9" || argv[1] != "10" || argv[1] != "11" || argv[1] != "12" ||argv[1] != "jan" || argv[1] != "feb" || argv[1] != "mar" || argv[1] != "apr" || argv[1] != "may" || argv[1] != "jun" || argv[1] != "jul" || argv[1] != "aug" || argv[1] != "sep" || argv[1] != "oct" || argv[1] != "nov" || argv[1] != "dec" )
-                {
-                    printf("'%s' is an invalid month", argv[1]);
-                    exit(0);
-                }
+                printf("'%s' is an invalid month", argv[1]);
+                exit(0);
             }
-
-            int month = atoi(argv[1]);
-            char const *const cronfile = argv[2];
-            char const *const estimatesfile = argv[3];
-            readestimates(estimatesfile);
-            printf("\n");
-            readcrontab(cronfile);
-            mostfrequent(month);
-            printf("\ndaily-backup 31 1");
         }
     }
     else
