@@ -7,6 +7,8 @@
 
 #define MAX_LEN 256
 int total_commands;
+char frequent_command[20];
+int last_command;
 
 // for reading crontab file
 void readcrontab(char const *const filename)
@@ -85,9 +87,10 @@ void readCommands(char *line, char *month)
     char newString[100][100];
     int i, j, ctr;
     char *str1;
+    int temp;
     str1 = uniq_spc(line);
     // printf("str1: %s\n",str1);
-
+    temp = total_commands;
     j = 0;
     ctr = 0;
     for (i = 0; i <= (strlen(str1)); i++)
@@ -117,6 +120,31 @@ void readCommands(char *line, char *month)
     // printf("\n%s", newString[3]);
     // printf("\nmonth: %s", month);
 
+    if (month == "jan")
+        month = "1";
+    else if (month == "feb")
+        month = "2";
+    else if (month == "mar")
+        month = "3";
+    else if (month == "apr")
+        month = "4";
+    else if (month == "may")
+        month = "5";
+    else if (month == "jun")
+        month = "6";
+    else if (month == "jul")
+        month = "7";
+    else if (month == "aug")
+        month = "8";
+    else if (month == "sep")
+        month = "9";
+    else if (month == "oct")
+        month = "10";
+    else if (month == "nov")
+        month = "11";
+    else if (month == "dec")
+        month = "12";
+
     if (strcmp(newString[3], month) == 0 || strcmp(newString[3], "*") == 0)
     {
         if (strcmp(newString[4], "*") == 0)
@@ -137,11 +165,17 @@ void readCommands(char *line, char *month)
                 total_commands = total_commands + 4;
         }
     }
-    printf("\ntotal commands: %d", total_commands);
+    if (last_command > total_commands - temp)
+        strcpy(frequent_command, newString[5]);
+    last_command = total_commands - temp;
+
+    // printf("\ntotal commands: %d", total_commands);
+    // printf("\nlast command: %d", last_command);
+
 }
 
 // for fetching most user command
-int mostfrequent(char *month)
+int mostfrequent(char const *const filename, char *month)
 {
     FILE *file;
     char *line = NULL;
@@ -153,7 +187,7 @@ int mostfrequent(char *month)
     printf("\nmonth: %s", month);
 
     // Opens file in read mode
-    file = fopen("crontab-file.txt", "r");
+    file = fopen(filename, "r");
 
     // If file doesn't exist
     if (file == NULL)
@@ -175,7 +209,7 @@ int mostfrequent(char *month)
         readCommands(line, month);
     }
 
-    printf("\ntotal commands: %d", total_commands);
+    printf("\n %s %d %d", frequent_command, total_commands, last_command);
     // printf("daily-backup	37	1");
     fclose(file);
 
@@ -217,8 +251,7 @@ void main(int argc, char *argv[])
                 readestimates(estimatesfile);
                 printf("\n");
                 readcrontab(cronfile);
-                mostfrequent(month);
-                printf("\ndaily-backup 31 1");
+                mostfrequent(cronfile, month);
             }
             else
             {
